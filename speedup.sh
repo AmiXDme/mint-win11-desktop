@@ -88,7 +88,23 @@ S apt update && S apt install -y nala aria2
 echo "==> TCP BBR + fq (max throughput up/down)..."
 S bash -c 'printf "net.core.default_qdisc=fq\nnet.ipv4.tcp_congestion_control=bbr\n" > /etc/sysctl.d/99-speedup-bbr.conf'
 S sysctl -w net.core.default_qdisc=fq net.ipv4.tcp_congestion_control=bbr > /dev/null
-sysctl net.ipv4.tcp_congestion_control
+# fq on the live interface now + persistently (NM dispatcher, Mint default net).
+IFACE=$(ip -o route get 1.1.1.1 2>/dev/null | awk '{print $5}' | head -1)
+if [ -n "$IFACE" ]; then
+  S tc qdisc replace dev "$IFACE" root fq 2>/dev/null || true
+  S bash -c 'printf "#!/bin/sh\n[ \"$2\" = up ] && tc qdisc replace dev \"$1\" root fq\n" > /etc/NetworkManager/dispatcher.d/50-speedup-fq.sh'
+  S chmod +x /etc/NetworkManager/dispatcher.d/50-speedup-fq.sh
+  echo "    fq on $IFACE (persistent)"
+fi
+
+echo "==> Disable dead IPv6 (kills happy-eyeballs delay per connection)..."
+if ip -6 route get 2001:4860:4860::8888 >/dev/null 2>&1; then
+  echo "    (IPv6 works here, leaving it on)"
+else
+  S bash -c 'printf "net.ipv6.conf.all.disable_ipv6=1\nnet.ipv6.conf.default.disable_ipv6=1\nnet.ipv6.conf.lo.disable_ipv6=1\n" > /etc/sysctl.d/99-speedup-noipv6.conf'
+  S sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.lo.disable_ipv6=1 > /dev/null
+  echo "    IPv6 off (was unreachable)"
+fi
 
 echo "==> git/GitHub through fast proxy..."
 git config --global url."https://gh-proxy.com/https://github.com/".insteadOf "https://github.com/" \

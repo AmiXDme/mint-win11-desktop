@@ -39,7 +39,8 @@ local Ubuntu mirror wins on sustained throughput, Cloudflare DNS 3ms vs 28ms.
 | DNS | Cloudflare 1.1.1.1 (`resolved.conf.d`) | 3ms lookups |
 | apt mirror | Fastest auto-picked, `bd.archive.ubuntu.com` default (`--retest` to re-measure) | max sustained throughput, backup kept |
 | apt | `nala` (parallel) + lean config (no lang downloads, timeouts) | parallel package fetches |
-| TCP | BBR + fq (`sysctl.d`, persistent) | max throughput up + down |
+| TCP | BBR + fq (`sysctl.d`, live interface + NM dispatcher) | max throughput up + down |
+| IPv6 | Disabled if unreachable (else kept) | kills happy-eyeballs delay per connection |
 | git | gh-proxy.com rewrite (`~/.gitconfig`) | ~2× GitHub clone speed |
 | Downloader | `aria2` + extreme defaults (`config/aria2.conf`: 16 conns × 16 splits) | any URL at max connections |
 
