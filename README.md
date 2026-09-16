@@ -13,9 +13,10 @@ Mint install and run `./install.sh` to get the exact same setup.
   into the menu search.
 - **Panel layout** — Menu → Search → open windows, centered (Win11 order),
   plus live CPU/MEM/NET/DISK monitor at the right.
-- **System monitor** (`multicore-sys-monitor@ccadeptic23`, stock upstream) —
-  realtime graphs every 500ms, tuned: merged CPU graph, no temp/load overlays,
-  wide NET/DISK graphs. Temp + details in hover tooltip.
+- **System monitor** — realtime **text** readout in the taskbar
+  (`sysmon-text@win11`, custom): `CPU %  MEM used  ▼down ▲up  ⬇disk-read ⬆disk-write`,
+  refreshed every second, auto-detects network/disk. (Graph version
+  `multicore-sys-monitor@ccadeptic23` also ships in the repo but is off-panel.)
 - **Themes** — Fluent-round-Dark (GTK + Cinnamon), Win11-dark icons,
   Fluent-dark cursors (auto-fetched; applied from `config/themes.txt`).
 

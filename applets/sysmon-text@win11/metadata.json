@@ -1,0 +1,6 @@
+{
+  "uuid": "sysmon-text@win11",
+  "name": "SysMon Text",
+  "description": "Realtime text readout: CPU MEM NET DISK speeds",
+  "max-instances": 1
+}
