@@ -87,9 +87,12 @@ if ! grep -q "mint-win11-desktop: default to fastest" "$HOME/.bashrc" 2>/dev/nul
 # mint-win11-desktop: default to fastest tools
 command -v nala >/dev/null 2>&1 && alias apt='nala'
 alias sudo='sudo '
+export PATH="$HOME/.local/bin:$PATH"
 EOF
-  echo "    apt aliased to nala (applies to new terminals)"
+  echo "    apt aliased to nala, ~/.local/bin on PATH (new terminals)"
 fi
+# This shell too:
+export PATH="$HOME/.local/bin:$PATH"
 
 echo "==> Restoring panel layout (Menu -> Search -> windows, centered)..."
 dconf write /org/cinnamon/enabled-applets "$(cat "$REPO_DIR/config/enabled-applets.txt")"

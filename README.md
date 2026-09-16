@@ -47,10 +47,12 @@ local Ubuntu mirror wins on sustained throughput, Cloudflare DNS 3ms vs 28ms.
 | TCP | BBR + fq (`sysctl.d`, live interface + NM dispatcher) | max throughput up + down |
 | IPv6 | Disabled if unreachable (else kept) | kills happy-eyeballs delay per connection |
 | git | gh-proxy.com rewrite (`~/.gitconfig`) | ~2× GitHub clone speed |
+| Python | PyPI direct (no China mirror) + `uv` installer | parallel Rust-based installs |
 | Downloader | `aria2` + extreme defaults (`config/aria2.conf`: 16 conns × 16 splits) | any URL at max connections |
 
 After setup: plain `sudo apt install <pkg>` already runs **nala** (parallel)
-via shell alias, `aria2c <url>` for files, git auto-routes via proxy.
+via shell alias, `uv pip install <pkg>` for Python (fastest), `aria2c <url>`
+for files, git auto-routes via proxy.
 
 ## System tune-up (`tuneup.sh`, also run by `install.sh`)
 

@@ -110,4 +110,14 @@ echo "==> git/GitHub through fast proxy..."
 git config --global url."https://gh-proxy.com/https://github.com/".insteadOf "https://github.com/" \
   && echo "    git will use gh-proxy.com for github.com"
 
+echo "==> Python: PyPI direct + uv (fastest installer)..."
+mkdir -p ~/.config/pip
+printf '[global]\nindex-url = https://pypi.org/simple/\n' > ~/.config/pip/pip.conf
+if ! command -v uv >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/uv" ]; then
+  curl -sSL https://astral.sh/uv/install.sh -o /tmp/uv-install.sh \
+    && sh /tmp/uv-install.sh 2>&1 | tail -1 || echo "    (uv install failed)"
+else
+  echo "    (uv already installed)"
+fi
+
 echo "Done. Fastest DNS + mirror + parallel apt + git proxy active."
