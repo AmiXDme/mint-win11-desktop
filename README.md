@@ -23,11 +23,11 @@ cd mint-win11-desktop
 ./install.sh
 ```
 
-`install.sh` does everything: extreme speed tuning, installs build tools via
-nala (needs sudo), clones + installs the three upstream theme packs below
-(in parallel, skips any already present), copies both applets, restores applet
-settings + panel layout, applies the themes, and restarts Cinnamon.
-Safe to re-run.
+`install.sh` does everything: extreme speed tuning, system tune-up, installs
+build tools via nala (needs sudo), clones + installs the three upstream theme
+packs below (in parallel, skips any already present), copies both applets,
+restores applet settings + panel layout, applies the themes, and restarts
+Cinnamon. Safe to re-run.
 
 ## Extreme speed stack (`speedup.sh`, also run by `install.sh`)
 
@@ -45,6 +45,16 @@ local Ubuntu mirror wins on sustained throughput, Cloudflare DNS 3ms vs 28ms.
 | Downloader | `aria2` + extreme defaults (`config/aria2.conf`: 16 conns × 16 splits) | any URL at max connections |
 
 After setup: `sudo nala install <pkg>` for packages, `aria2c <url>` for files.
+
+## System tune-up (`tuneup.sh`, also run by `install.sh`)
+
+Built for this PC's profile (i5, 8GB RAM, SSD, coder running Chrome + Electron):
+
+| Area | Setting | Why |
+|------|---------|-----|
+| Swap | 4G zram @ prio 100 + swappiness 180 (disk swap kept as overflow) | RAM pressure (browser + Electron) compresses instead of thrashing SSD |
+| CPU | `performance` governor, all cores | max clocks on demand-free desktop |
+| Logs | journal capped 200M + vacuumed, apt autocleaned | frees SSD, faster boots |
 
 ## Theme packs (auto-installed from upstream)
 

@@ -31,6 +31,9 @@ need_cmd() { command -v "$1" >/dev/null 2>&1; }
 echo "==> Speeding up downloads (mirrors + git proxy)..."
 "$REPO_DIR/speedup.sh" || echo "WARNING: speedup.sh had issues, continuing..."
 
+echo "==> System tune-up (zram, CPU, logs)..."
+"$REPO_DIR/tuneup.sh" || echo "WARNING: tuneup.sh had issues, continuing..."
+
 echo "==> Ensuring build tools (git, sassc, murrine engine)..."
 if ! need_cmd git || ! need_cmd sassc; then
   if need_cmd nala; then S nala install -y git sassc gtk2-engines-murrine
