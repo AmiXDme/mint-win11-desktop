@@ -18,6 +18,16 @@ echo "==> Restoring panel layout (Menu -> Search -> windows, centered)..."
 dconf write /org/cinnamon/enabled-applets "$(cat "$REPO_DIR/config/enabled-applets.txt")"
 dconf write /org/cinnamon/next-applet-id "$(cat "$REPO_DIR/config/next-applet-id.txt")"
 
+echo "==> Restoring themes (Fluent-round-Dark + Win11-dark icons)..."
+while IFS='=' read -r key value; do
+  case "$key" in
+    gtk-theme) gsettings set org.cinnamon.desktop.interface gtk-theme "$value" ;;
+    icon-theme) gsettings set org.cinnamon.desktop.interface icon-theme "$value" ;;
+    cursor-theme) gsettings set org.cinnamon.desktop.interface cursor-theme "$value" ;;
+    cinnamon-theme) dconf write /org/cinnamon/theme/name "'$value'" ;;
+  esac
+done < "$REPO_DIR/config/themes.txt"
+
 echo "==> Restarting Cinnamon..."
 cinnamon --replace > /dev/null 2>&1 &
 sleep 3

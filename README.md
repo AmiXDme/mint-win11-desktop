@@ -12,6 +12,9 @@ Mint install and run `./install.sh` to get the exact same setup.
   button and the window list. Clicking it opens the menu; typing goes straight
   into the menu search.
 - **Panel layout** — Menu → Search → open windows, centered (Win11 order).
+- **Themes** — Fluent-round-Dark (GTK + Cinnamon), Win11-dark icons,
+  Fluent-dark cursors (restored from `config/themes.txt`; the theme/icon packs
+  themselves must already be installed).
 
 ## Fresh-install steps
 

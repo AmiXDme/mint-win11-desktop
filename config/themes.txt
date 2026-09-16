@@ -1,0 +1,4 @@
+gtk-theme=Fluent-round-Dark
+icon-theme=Win11-dark
+cursor-theme=Fluent-dark-cursors
+cinnamon-theme=Fluent-round-Dark
