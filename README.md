@@ -16,7 +16,7 @@ Mint install and run `./install.sh` to get the exact same setup.
 ## Fresh-install steps
 
 ```bash
-git clone <your-repo-url> mint-win11-desktop
+git clone https://github.com/AmiXDme/mint-win11-desktop.git
 cd mint-win11-desktop
 ./install.sh
 ```
