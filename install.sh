@@ -80,6 +80,17 @@ echo "==> Max-speed downloader defaults (aria2: 16 conns x 16 splits)..."
 mkdir -p "$HOME/.aria2"
 cp "$REPO_DIR/config/aria2.conf" "$HOME/.aria2/aria2.conf"
 
+echo "==> Default to fastest tools (apt -> nala)..."
+if ! grep -q "mint-win11-desktop: default to fastest" "$HOME/.bashrc" 2>/dev/null; then
+  cat >> "$HOME/.bashrc" <<'EOF'
+
+# mint-win11-desktop: default to fastest tools
+command -v nala >/dev/null 2>&1 && alias apt='nala'
+alias sudo='sudo '
+EOF
+  echo "    apt aliased to nala (applies to new terminals)"
+fi
+
 echo "==> Restoring panel layout (Menu -> Search -> windows, centered)..."
 dconf write /org/cinnamon/enabled-applets "$(cat "$REPO_DIR/config/enabled-applets.txt")"
 dconf write /org/cinnamon/next-applet-id "$(cat "$REPO_DIR/config/next-applet-id.txt")"

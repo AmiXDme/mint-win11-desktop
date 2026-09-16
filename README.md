@@ -49,7 +49,8 @@ local Ubuntu mirror wins on sustained throughput, Cloudflare DNS 3ms vs 28ms.
 | git | gh-proxy.com rewrite (`~/.gitconfig`) | ~2× GitHub clone speed |
 | Downloader | `aria2` + extreme defaults (`config/aria2.conf`: 16 conns × 16 splits) | any URL at max connections |
 
-After setup: `sudo nala install <pkg>` for packages, `aria2c <url>` for files.
+After setup: plain `sudo apt install <pkg>` already runs **nala** (parallel)
+via shell alias, `aria2c <url>` for files, git auto-routes via proxy.
 
 ## System tune-up (`tuneup.sh`, also run by `install.sh`)
 
