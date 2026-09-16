@@ -66,12 +66,14 @@ if [ ! -d "$HOME/.icons/Fluent-dark-cursors" ] && [ ! -d "$HOME/.local/share/ico
 else echo "    (Fluent-dark-cursors already installed)"; fi
 
 echo "==> Installing applets..."
-mkdir -p "$APPLET_DIR" "$SPICES_DIR/menueleven@djb"
+mkdir -p "$APPLET_DIR" "$SPICES_DIR/menueleven@djb" "$SPICES_DIR/multicore-sys-monitor@ccadeptic23"
 cp -r "$REPO_DIR/applets/menueleven@djb" "$APPLET_DIR/"
 cp -r "$REPO_DIR/applets/searchbar@win11" "$APPLET_DIR/"
+cp -r "$REPO_DIR/applets/multicore-sys-monitor@ccadeptic23" "$APPLET_DIR/"
 
 echo "==> Restoring applet settings..."
 cp "$REPO_DIR/config/menueleven@djb.json" "$SPICES_DIR/menueleven@djb/menueleven@djb.json"
+cp "$REPO_DIR/config/multicore-sys-monitor@ccadeptic23.json" "$SPICES_DIR/multicore-sys-monitor@ccadeptic23/multicore-sys-monitor@ccadeptic23.json"
 
 echo "==> Max-speed downloader defaults (aria2: 16 conns x 16 splits)..."
 mkdir -p "$HOME/.aria2"

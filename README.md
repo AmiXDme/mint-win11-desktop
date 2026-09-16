@@ -11,7 +11,11 @@ Mint install and run `./install.sh` to get the exact same setup.
 - **Taskbar search bar** (`searchbar@win11`) — centered pill between the Menu
   button and the window list. Clicking it opens the menu; typing goes straight
   into the menu search.
-- **Panel layout** — Menu → Search → open windows, centered (Win11 order).
+- **Panel layout** — Menu → Search → open windows, centered (Win11 order),
+  plus live CPU/MEM/NET/DISK monitor at the right.
+- **System monitor** (`multicore-sys-monitor@ccadeptic23`, stock upstream) —
+  realtime graphs every 500ms, tuned: merged CPU graph, no temp/load overlays,
+  wide NET/DISK graphs. Temp + details in hover tooltip.
 - **Themes** — Fluent-round-Dark (GTK + Cinnamon), Win11-dark icons,
   Fluent-dark cursors (auto-fetched; applied from `config/themes.txt`).
 
