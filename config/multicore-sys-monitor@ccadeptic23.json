@@ -607,7 +607,7 @@
         "max": 10,
         "step": 1,
         "show-value": true,
-        "value": 4
+        "value": 2
     },
     "thickness": {
         "type": "scale",
@@ -617,7 +617,7 @@
         "max": 5,
         "step": 1,
         "show-value": true,
-        "value": 2
+        "value": 1
     },
     "ledForCurves": {
         "type": "combobox",
@@ -962,7 +962,7 @@
         "step": 1,
         "show-value": true,
         "dependency": "!CPU_squared",
-        "value": 70
+        "value": 45
     },
     "CPU_mergeAll": {
         "type": "switch",
@@ -1365,7 +1365,7 @@
         "step": 1,
         "show-value": true,
         "dependency": "!Mem_squared",
-        "value": 70
+        "value": 45
     },
     "Mem_startAt12Oclock": {
         "type": "switch",
@@ -1528,7 +1528,7 @@
         "step": 1,
         "show-value": true,
         "dependency": "!Net_squared",
-        "value": 90
+        "value": 60
     },
     "Net_mergeAll": {
         "type": "switch",
@@ -1750,7 +1750,7 @@
         "default": false,
         "description": "Only display when hovering over this applet",
         "dependency": "Net_total_display",
-        "value": false
+        "value": true
     },
     "Net_totalCorner": {
         "type": "combobox",
@@ -1840,7 +1840,7 @@
         "step": 1,
         "show-value": true,
         "dependency": "!Disk_squared",
-        "value": 90
+        "value": 60
     },
     "Disk_mergeAll": {
         "type": "switch",
@@ -2081,7 +2081,7 @@
         "default": false,
         "description": "Only display when hovering over this applet",
         "dependency": "Disk_speed_display",
-        "value": false
+        "value": true
     },
     "Disk_speedCorner": {
         "type": "combobox",
