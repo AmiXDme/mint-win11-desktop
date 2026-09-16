@@ -10,11 +10,31 @@ SPICES_DIR="$HOME/.config/cinnamon/spices"
 TMP_BASE="${TMPDIR:-/tmp}/mint-win11-setup"
 mkdir -p "$TMP_BASE"
 
+SUDO_PW=""
+S() { # S <cmd...>: run privileged command, asking the sudo password once
+  if [ -z "$SUDO_PW" ] && ! sudo -n true 2>/dev/null; then
+    printf 'sudo password: ' >&2
+    IFS= read -rs SUDO_PW < /dev/tty 2>/dev/null \
+      || IFS= read -rs SUDO_PW \
+      || { echo "cannot read password"; exit 1; }
+    printf '\n' >&2
+    printf '%s\n' "$SUDO_PW" | sudo -S -v 2>/dev/null \
+      || { SUDO_PW=""; echo "sudo failed"; exit 1; }
+  fi
+  if [ -n "$SUDO_PW" ]; then printf '%s\n' "$SUDO_PW" | sudo -S "$@";
+  else sudo "$@"; fi
+}
+trap 'SUDO_PW=""' EXIT
+
 need_cmd() { command -v "$1" >/dev/null 2>&1; }
+
+echo "==> Speeding up downloads (mirrors + git proxy)..."
+"$REPO_DIR/speedup.sh" || echo "WARNING: speedup.sh had issues, continuing..."
 
 echo "==> Ensuring build tools (git, sassc, murrine engine)..."
 if ! need_cmd git || ! need_cmd sassc; then
-  sudo apt update && sudo apt install -y git sassc gtk2-engines-murrine
+  if need_cmd nala; then S nala install -y git sassc gtk2-engines-murrine
+  else S apt install -y git sassc gtk2-engines-murrine; fi
 fi
 
 fetch() { # fetch <name> <url> <dest>
@@ -22,32 +42,25 @@ fetch() { # fetch <name> <url> <dest>
   git clone --depth 1 "$2" "$3"
 }
 
-echo "==> Theme pack: Fluent gtk theme (Fluent-round-Dark)..."
+echo "==> Theme packs (cloning in parallel)..."
+fetch Fluent-gtk-theme https://github.com/vinceliuice/Fluent-gtk-theme.git "$TMP_BASE/Fluent-gtk-theme" &
+fetch Win11-icon-theme https://github.com/yeyushengfan258/Win11-icon-theme.git "$TMP_BASE/Win11-icon-theme" &
+fetch Fluent-icon-theme https://github.com/vinceliuice/Fluent-icon-theme.git "$TMP_BASE/Fluent-icon-theme" &
+wait
+
+echo "==> Installing theme packs..."
 if [ ! -d "$HOME/.themes/Fluent-round-Dark" ]; then
-  fetch Fluent-gtk-theme https://github.com/vinceliuice/Fluent-gtk-theme.git "$TMP_BASE/Fluent-gtk-theme" \
-    && (cd "$TMP_BASE/Fluent-gtk-theme" && ./install.sh -d "$HOME/.themes" -c dark --tweaks round) \
+  (cd "$TMP_BASE/Fluent-gtk-theme" && ./install.sh -d "$HOME/.themes" -c dark --tweaks round) \
     || echo "WARNING: Fluent-gtk-theme install failed, continuing..."
-else
-  echo "    (already installed)"
-fi
-
-echo "==> Theme pack: Win11 icons (Win11-dark)..."
+else echo "    (Fluent-round-Dark already installed)"; fi
 if [ ! -d "$HOME/.local/share/icons/Win11-dark" ]; then
-  fetch Win11-icon-theme https://github.com/yeyushengfan258/Win11-icon-theme.git "$TMP_BASE/Win11-icon-theme" \
-    && (cd "$TMP_BASE/Win11-icon-theme" && ./install.sh) \
+  (cd "$TMP_BASE/Win11-icon-theme" && ./install.sh) \
     || echo "WARNING: Win11-icon-theme install failed, continuing..."
-else
-  echo "    (already installed)"
-fi
-
-echo "==> Theme pack: Fluent cursors (Fluent-dark-cursors)..."
+else echo "    (Win11-dark already installed)"; fi
 if [ ! -d "$HOME/.icons/Fluent-dark-cursors" ] && [ ! -d "$HOME/.local/share/icons/Fluent-dark-cursors" ]; then
-  fetch Fluent-icon-theme https://github.com/vinceliuice/Fluent-icon-theme.git "$TMP_BASE/Fluent-icon-theme" \
-    && (cd "$TMP_BASE/Fluent-icon-theme/cursors" && ./install.sh) \
+  (cd "$TMP_BASE/Fluent-icon-theme/cursors" && ./install.sh) \
     || echo "WARNING: Fluent cursor install failed, continuing..."
-else
-  echo "    (already installed)"
-fi
+else echo "    (Fluent-dark-cursors already installed)"; fi
 
 echo "==> Installing applets..."
 mkdir -p "$APPLET_DIR" "$SPICES_DIR/menueleven@djb"
@@ -56,6 +69,10 @@ cp -r "$REPO_DIR/applets/searchbar@win11" "$APPLET_DIR/"
 
 echo "==> Restoring applet settings..."
 cp "$REPO_DIR/config/menueleven@djb.json" "$SPICES_DIR/menueleven@djb/menueleven@djb.json"
+
+echo "==> Max-speed downloader defaults (aria2: 16 conns x 16 splits)..."
+mkdir -p "$HOME/.aria2"
+cp "$REPO_DIR/config/aria2.conf" "$HOME/.aria2/aria2.conf"
 
 echo "==> Restoring panel layout (Menu -> Search -> windows, centered)..."
 dconf write /org/cinnamon/enabled-applets "$(cat "$REPO_DIR/config/enabled-applets.txt")"
