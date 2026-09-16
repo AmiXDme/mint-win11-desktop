@@ -13,10 +13,9 @@ Mint install and run `./install.sh` to get the exact same setup.
   into the menu search.
 - **Panel layout** — Menu → Search → open windows, centered (Win11 order).
 - **Themes** — Fluent-round-Dark (GTK + Cinnamon), Win11-dark icons,
-  Fluent-dark cursors (restored from `config/themes.txt`; the theme/icon packs
-  themselves must already be installed).
+  Fluent-dark cursors (auto-fetched; applied from `config/themes.txt`).
 
-## Fresh-install steps
+## Fresh-install steps (fully automatic)
 
 ```bash
 git clone https://github.com/AmiXDme/mint-win11-desktop.git
@@ -24,9 +23,18 @@ cd mint-win11-desktop
 ./install.sh
 ```
 
-`install.sh` copies both applets into `~/.local/share/cinnamon/applets/`,
-restores the applet settings + panel layout via dconf, and restarts Cinnamon.
-No sudo needed.
+`install.sh` does everything: installs build tools via apt (needs sudo),
+clones + installs the three upstream theme packs below (skips any already
+present), copies both applets, restores applet settings + panel layout, applies
+the themes, and restarts Cinnamon. Safe to re-run.
+
+## Theme packs (auto-installed from upstream)
+
+| Pack | Upstream | Installed as |
+|------|----------|--------------|
+| Fluent GTK theme (`--tweaks round`, dark) | vinceliuice/Fluent-gtk-theme | `~/.themes/Fluent-round-Dark` |
+| Win11 icons | yeyushengfan258/Win11-icon-theme | `~/.local/share/icons/Win11-dark` |
+| Fluent cursors | vinceliuice/Fluent-icon-theme (`cursors/`) | `~/.local/share/icons/Fluent-dark-cursors` |
 
 ## Fixes included (vs upstream)
 
