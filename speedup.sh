@@ -73,7 +73,7 @@ for f in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
     changed=1
   fi
 done
-# Mint main repo stays official (no faster local option).
+  # Mint main handled in its own section below.
 
 echo "==> Lean apt config (no lang downloads, sane timeouts)..."
 S bash -c 'printf "Acquire::Languages \"none\";\nAcquire::http::Timeout \"15\";\nAcquire::https::Timeout \"15\";\nAcquire::Retries \"3\";\n" > /etc/apt/apt.conf.d/99-speedup'
@@ -104,6 +104,44 @@ else
   S bash -c 'printf "net.ipv6.conf.all.disable_ipv6=1\nnet.ipv6.conf.default.disable_ipv6=1\nnet.ipv6.conf.lo.disable_ipv6=1\n" > /etc/sysctl.d/99-speedup-noipv6.conf'
   S sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.lo.disable_ipv6=1 > /dev/null
   echo "    IPv6 off (was unreachable)"
+fi
+
+# Mint main: official server is ~45KB/s from here; tuna mirror does ~2.5MB/s.
+# Default straight to tuna (measured 55x winner); --retest re-measures live.
+MINT_HOST="mirrors.tuna.tsinghua.edu.cn/linuxmint"
+if [ "${1:-}" = "--retest" ]; then
+  MINT_CANDIDATES=(
+    "http://packages.linuxmint.com"
+    "https://mirrors.tuna.tsinghua.edu.cn/linuxmint"
+    "https://mirror.aarnet.edu.au/pub/linuxmint-packages"
+  )
+  best=""; best_speed=0
+  echo "==> Benchmarking Mint mirrors (8MB range of real firefox deb)..."
+  for base in "${MINT_CANDIDATES[@]}"; do
+    fn=$(curl -sL --max-time 30 "$base/dists/zena/upstream/binary-amd64/Packages.gz" 2>/dev/null \
+      | zcat 2>/dev/null | grep -A8 "^Package: firefox$" | grep Filename | awk '{print $2}' | head -1)
+    speed=0; code="000"
+    if [ -n "$fn" ]; then
+      read -r code speed _ < <(curl -sL -o /dev/null \
+        -w "%{http_code} %{speed_download} x" --max-time 45 -r 0-8000000 "$base/$fn" 2>/dev/null)
+      speed=${speed%.*}; [ -z "$speed" ] && speed=0
+    fi
+    printf "    %-58s %s %s B/s\n" "$base" "$code" "$speed"
+    if [ "$speed" -gt "$best_speed" ]; then best_speed=$speed; best=$base; fi
+  done
+  if [ -n "$best" ]; then MINT_HOST=$(echo "$best" | sed 's#https\?://##'); fi
+fi
+
+echo "==> Mint main -> $MINT_HOST ..."
+if grep -Eq "^[[:space:]#]*deb(-src)? +https?://[^/ ]+ +zena " /etc/apt/sources.list.d/*.list 2>/dev/null; then
+  for f in /etc/apt/sources.list.d/*.list; do
+    if grep -Eq "^[[:space:]#]*deb(-src)? +https?://[^/ ]+ +zena " "$f" 2>/dev/null; then
+      [ -f "$f.bak-speedup" ] || S cp "$f" "$f.bak-speedup"
+      # Only zena (Mint) lines — never touch Ubuntu archive lines here.
+      S sed -E -i "/[[:space:]]zena / s#https?://[^/ ]+#https://$MINT_HOST#g" "$f"
+      echo "    updated $f"
+    fi
+  done
 fi
 
 echo "==> git/GitHub through fast proxy..."

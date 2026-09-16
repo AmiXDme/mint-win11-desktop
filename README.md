@@ -43,6 +43,7 @@ local Ubuntu mirror wins on sustained throughput, Cloudflare DNS 3ms vs 28ms.
 |-------|---------|-----|
 | DNS | Cloudflare 1.1.1.1 (`resolved.conf.d`) | 3ms lookups |
 | apt mirror | Fastest auto-picked, `bd.archive.ubuntu.com` default (`--retest` to re-measure) | max sustained throughput, backup kept |
+| Mint mirror | `mirrors.tuna.tsinghua.edu.cn` default, 55× faster than official here (`--retest` range-races live) | official does ~45KB/s, tuna ~2.5MB/s |
 | apt | `nala` (parallel) + lean config (no lang downloads, timeouts) | parallel package fetches |
 | TCP | BBR + fq (`sysctl.d`, live interface + NM dispatcher) | max throughput up + down |
 | IPv6 | Disabled if unreachable (else kept) | kills happy-eyeballs delay per connection |
