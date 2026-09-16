@@ -56,6 +56,11 @@ Built for this PC's profile (i5, 8GB RAM, SSD, coder running Chrome + Electron):
 | CPU | `performance` governor, all cores | max clocks on demand-free desktop |
 | Logs | journal capped 200M + vacuumed, apt autocleaned | frees SSD, faster boots |
 
+## Cleanup (`cleanup.sh`, also run by `install.sh`)
+
+Frees disk: `apt clean`, `apt autoremove --purge` (old kernels — keeps the
+running one — plus orphans), thumbnail cache. Typical saving: ~3GB.
+
 ## Theme packs (auto-installed from upstream)
 
 | Pack | Upstream | Installed as |

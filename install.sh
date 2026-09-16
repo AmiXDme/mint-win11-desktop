@@ -95,4 +95,7 @@ echo "==> Restarting Cinnamon..."
 cinnamon --replace > /dev/null 2>&1 &
 sleep 3
 
+echo "==> Final cleanup (apt cache, orphans, thumbnails)..."
+"$REPO_DIR/cleanup.sh" || echo "WARNING: cleanup.sh had issues, continuing..."
+
 echo "Done. Press the Windows key to open the Win11 start menu."
