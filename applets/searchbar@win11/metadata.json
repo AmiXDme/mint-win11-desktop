@@ -1,0 +1,7 @@
+{
+  "uuid": "searchbar@win11",
+  "name": "Win11 Search Bar",
+  "description": "Windows 11 style search box on panel — focus triggers menu search",
+  "max-instances": 1,
+  "website": ""
+}

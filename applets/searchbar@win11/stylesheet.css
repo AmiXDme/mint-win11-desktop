@@ -1,0 +1,15 @@
+.searchbar-win11-entry {
+  border-radius: 9999px;
+  padding: 6px 14px;
+  min-width: 180px;
+  background-color: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.87);
+  selection-background-color: #4CC2FF;
+  caret-size: 1px;
+}
+.searchbar-win11-entry:focus {
+  border: 1px solid #4CC2FF;
+  background-color: rgba(255,255,255,0.08);
+}
+.searchbar-win11-entry StLabel { color: rgba(255,255,255,0.6); }
