@@ -26,7 +26,8 @@ MyApplet.prototype = {
     this._prevT = 0;
     this._iface = this._defaultIface();
     this.set_applet_label('…');
-    this._tick();
+    this._tick();       // instant first paint
+    this._startLoop();  // then realtime repeat
   },
 
   _read: function(path) {
@@ -98,7 +99,12 @@ MyApplet.prototype = {
         ' ▼' + this._fmtRate(downR) + ' ▲' + this._fmtRate(upR)
       );
     } catch(e) {}
-    Mainloop.timeout_add_seconds(1, () => { this._tick(); return false; });
+    // Realtime: 4 updates/sec. timeout_add repeats while we return true.
+    return true;
+  },
+
+  _startLoop: function() {
+    Mainloop.timeout_add(250, () => this._tick());
   }
 };
 
