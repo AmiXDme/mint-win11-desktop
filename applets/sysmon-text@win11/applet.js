@@ -22,12 +22,9 @@ MyApplet.prototype = {
       if (!lbl) lbl = (kids && kids.length) ? kids[0] : null;
       if (lbl && lbl.set_style) lbl.set_style('font-family: monospace;');
     } catch(e) {}
-    this._prevCpu = null;
     this._prevNet = null;
-    this._prevDisk = null;
     this._prevT = 0;
     this._iface = this._defaultIface();
-    this._disk = this._rootDisk();
     this.set_applet_label('…');
     this._tick();
   },
@@ -46,23 +43,6 @@ MyApplet.prototype = {
       }
     } catch(e) {}
     return 'enp2s0';
-  },
-
-  _rootDisk: function() {
-    try {
-      let lines = this._read('/proc/mounts').split('\n');
-      for (let l of lines) {
-        let f = l.trim().split(/\s+/);
-        if (f[1] === '/' && f[0].indexOf('/dev/') === 0) {
-          let dev = f[0].replace('/dev/', '');
-          // sda2 -> sda, nvme0n1p2 -> nvme0n1
-          let m = dev.match(/^([a-z]+\d*n?\d*[a-z]*?)\d*[a-z]?\d*$/);
-          let base = dev.replace(/p?\d+$/, '');
-          return base || dev;
-        }
-      }
-    } catch(e) {}
-    return 'sda';
   },
 
   _fmtRate: function(bps) {
@@ -89,17 +69,6 @@ MyApplet.prototype = {
       let dt = this._prevT > 0 ? (now - this._prevT) : 1;
       this._prevT = now;
 
-      // --- CPU ---
-      let cpuLine = this._read('/proc/stat').split('\n')[0].split(/\s+/).slice(1, 9).map(Number);
-      let idle = cpuLine[3] + cpuLine[4];
-      let total = cpuLine.reduce((a, b) => a + b, 0);
-      let cpuPct = 0;
-      if (this._prevCpu) {
-        let dIdle = idle - this._prevCpu.idle, dTot = total - this._prevCpu.total;
-        if (dTot > 0) cpuPct = Math.round(100 * (1 - dIdle / dTot));
-      }
-      this._prevCpu = { idle: idle, total: total };
-
       // --- MEM ---
       let memTotal = 0, memAvail = 0;
       for (let l of this._read('/proc/meminfo').split('\n')) {
@@ -124,25 +93,9 @@ MyApplet.prototype = {
       }
       this._prevNet = { down: down, up: up };
 
-      // --- DISK ---
-      let rd = 0, wr = 0;
-      for (let l of this._read('/proc/diskstats').split('\n')) {
-        let f = l.trim().split(/\s+/);
-        if (f[2] === this._disk) { rd = +f[5]; wr = +f[9]; }
-      }
-      let rdR = 0, wrR = 0;
-      if (this._prevDisk) {
-        rdR = Math.max(0, (rd - this._prevDisk.rd) * 512 / dt);
-        wrR = Math.max(0, (wr - this._prevDisk.wr) * 512 / dt);
-      }
-      this._prevDisk = { rd: rd, wr: wr };
-
-      let cpuStr = String(cpuPct);
-      while (cpuStr.length < 3) cpuStr = ' ' + cpuStr;
       this.set_applet_label(
-        'CPU ' + cpuStr + '% MEM ' + this._fmtMem(memUsed) +
-        ' ▼' + this._fmtRate(downR) + ' ▲' + this._fmtRate(upR) +
-        ' ⬇' + this._fmtRate(rdR) + ' ⬆' + this._fmtRate(wrR)
+        'MEM ' + this._fmtMem(memUsed) +
+        ' ▼' + this._fmtRate(downR) + ' ▲' + this._fmtRate(upR)
       );
     } catch(e) {}
     Mainloop.timeout_add_seconds(1, () => { this._tick(); return false; });
