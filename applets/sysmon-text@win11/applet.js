@@ -104,7 +104,7 @@ MyApplet.prototype = {
   },
 
   _startLoop: function() {
-    Mainloop.timeout_add(100, () => this._tick());
+    Mainloop.timeout_add(500, () => this._tick());
   }
 };
 
