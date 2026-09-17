@@ -71,7 +71,8 @@ Built for this PC's profile (i5, 8GB RAM, SSD, coder running Chrome + Electron):
 ## Cleanup (`cleanup.sh`, also run by `install.sh`)
 
 Frees disk: `apt clean`, `apt autoremove --purge` (old kernels — keeps the
-running one — plus orphans), thumbnail cache. Typical saving: ~3GB.
+running one — plus orphans), thumbnail + pip caches, unused Flathub remote
+(only when zero flatpak apps). Typical saving: ~3GB.
 
 ## Theme packs (auto-installed from upstream)
 

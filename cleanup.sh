@@ -26,6 +26,14 @@ S apt autoremove --purge -y
 echo "==> thumbnail + pip caches (uv cache kept: makes installs instant)..."
 rm -rf ~/.cache/thumbnails/* 2>/dev/null || true
 pip cache purge 2>/dev/null | tail -1 || true
+echo "==> unused flatpak remote (only if zero apps installed)..."
+if command -v flatpak >/dev/null 2>&1 && [ -z "$(flatpak list --app 2>/dev/null | head -1)" ]; then
+  S flatpak remote-delete flathub 2>/dev/null || true
+  S rm -rf /var/lib/flatpak/repo 2>/dev/null || true
+  S flatpak repair 2>/dev/null | tail -1 || true
+else
+  echo "    (flatpak apps present, leaving alone)"
+fi
 echo "==> disk now:"
 df -h / | tail -1
 echo "Done."
