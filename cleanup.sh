@@ -23,8 +23,9 @@ trap 'SUDO_PW=""' EXIT
 echo "==> apt cache clean + autoremove (old kernels, orphans)..."
 S apt clean
 S apt autoremove --purge -y
-echo "==> thumbnail cache..."
+echo "==> thumbnail + pip caches (uv cache kept: makes installs instant)..."
 rm -rf ~/.cache/thumbnails/* 2>/dev/null || true
+pip cache purge 2>/dev/null | tail -1 || true
 echo "==> disk now:"
 df -h / | tail -1
 echo "Done."

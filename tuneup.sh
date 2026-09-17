@@ -54,6 +54,25 @@ for g in /sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_governor; do
 done
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null || true
 
+echo "==> Faster boot: mask time-wait-sync, no NM-wait-online..."
+S systemctl mask systemd-time-wait-sync.service 2>/dev/null || true
+S systemctl disable NetworkManager-wait-online.service 2>/dev/null || true
+
+echo "==> Idle daemons off (printer-discovery, modem; cups kept)..."
+S systemctl disable --now cups-browsed.service 2>/dev/null || true
+S systemctl disable --now ModemManager.service 2>/dev/null || true
+
+echo "==> SSD scheduler -> none (live + udev persistent)..."
+for d in /sys/block/sd*/queue/scheduler /sys/block/nvme*/queue/scheduler; do
+  [ -w "$d" ] || continue
+  dev=$(echo "$d" | awk -F/ '{print $4}')
+  rot=$(cat "/sys/block/$dev/queue/rotational" 2>/dev/null)
+  if [ "$rot" = "0" ]; then
+    S bash -c "echo none > $d" 2>/dev/null || true
+  fi
+done
+S bash -c 'printf "ACTION==\"add|change\", KERNEL==\"sd[a-z]|nvme[0-9]n[0-9]\", ATTR{queue/rotational}==\"0\", ATTR{queue/scheduler}=\"none\"\n" > /etc/udev/rules.d/60-speedup-ssd.rules'
+
 echo "==> Journal cap 200M + vacuum + apt clean..."
 S mkdir -p /etc/systemd/journald.conf.d
 S bash -c 'printf "[Journal]\nSystemMaxUse=200M\nRuntimeMaxUse=100M\n" > /etc/systemd/journald.conf.d/99-speedup.conf'

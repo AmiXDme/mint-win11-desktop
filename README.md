@@ -63,6 +63,9 @@ Built for this PC's profile (i5, 8GB RAM, SSD, coder running Chrome + Electron):
 |------|---------|-----|
 | Swap | 4G zram @ prio 100 + swappiness 180 (disk swap kept as overflow) | RAM pressure (browser + Electron) compresses instead of thrashing SSD |
 | CPU | `performance` governor, all cores | max clocks on demand-free desktop |
+| Boot | mask `time-wait-sync`, no `NM-wait-online` (~7s saved) | both only matter for RTC-less/always-net boots |
+| Daemons | `cups-browsed`, `ModemManager` off (`cups` kept) | no printer/modem on this box |
+| SSD | scheduler `none` (live + udev rule) | no reordering overhead on flash |
 | Logs | journal capped 200M + vacuumed, apt autocleaned | frees SSD, faster boots |
 
 ## Cleanup (`cleanup.sh`, also run by `install.sh`)
