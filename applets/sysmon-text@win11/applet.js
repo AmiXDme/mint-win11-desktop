@@ -13,6 +13,15 @@ MyApplet.prototype = {
   _init: function(orientation, panelHeight, instanceId) {
     Applet.TextApplet.prototype._init.call(this, orientation, panelHeight, instanceId);
     this.actor.style_class = 'sysmon-text-label';
+    // Monospace + padded fields = constant pixel width, so the readout
+    // never resizes and pinned taskbar icons stay put.
+    // (TextApplet nests the St.Label in a StBin inside the box actor.)
+    try {
+      let kids = this.actor.get_children();
+      let lbl = (kids && kids.length) ? kids[0].get_child() : null;
+      if (!lbl) lbl = (kids && kids.length) ? kids[0] : null;
+      if (lbl && lbl.set_style) lbl.set_style('font-family: monospace;');
+    } catch(e) {}
     this._prevCpu = null;
     this._prevNet = null;
     this._prevDisk = null;
@@ -57,18 +66,21 @@ MyApplet.prototype = {
   },
 
   _fmtRate: function(bps) {
-    if (bps < 1024) return Math.round(bps) + 'B';
-    if (bps < 1048576) {
-      let v = (bps / 1024).toFixed(1).replace(/\.0$/, '');
-      return v + 'K';
-    }
-    let v = (bps / 1048576).toFixed(1).replace(/\.0$/, '');
-    return v + 'M';
+    let s;
+    if (bps < 1024) s = Math.round(bps) + 'B';
+    else if (bps < 1048576) s = (bps / 1024).toFixed(1).replace(/\.0$/, '') + 'K';
+    else s = (bps / 1048576).toFixed(1).replace(/\.0$/, '') + 'M';
+    // Fixed width: pad to 6 chars so layout never shifts.
+    while (s.length < 6) s = ' ' + s;
+    return s;
   },
 
   _fmtMem: function(kb) {
-    if (kb < 1048576) return Math.round(kb / 1024) + 'M';
-    return (kb / 1048576).toFixed(1).replace(/\.0$/, '') + 'G';
+    let s;
+    if (kb < 1048576) s = Math.round(kb / 1024) + 'M';
+    else s = (kb / 1048576).toFixed(1).replace(/\.0$/, '') + 'G';
+    while (s.length < 5) s = ' ' + s;
+    return s;
   },
 
   _tick: function() {
@@ -125,10 +137,12 @@ MyApplet.prototype = {
       }
       this._prevDisk = { rd: rd, wr: wr };
 
+      let cpuStr = String(cpuPct);
+      while (cpuStr.length < 3) cpuStr = ' ' + cpuStr;
       this.set_applet_label(
-        'CPU ' + cpuPct + '%  MEM ' + this._fmtMem(memUsed) +
-        '  ▼' + this._fmtRate(downR) + ' ▲' + this._fmtRate(upR) +
-        '  ⬇' + this._fmtRate(rdR) + ' ⬆' + this._fmtRate(wrR)
+        'CPU ' + cpuStr + '% MEM ' + this._fmtMem(memUsed) +
+        ' ▼' + this._fmtRate(downR) + ' ▲' + this._fmtRate(upR) +
+        ' ⬇' + this._fmtRate(rdR) + ' ⬆' + this._fmtRate(wrR)
       );
     } catch(e) {}
     Mainloop.timeout_add_seconds(1, () => { this._tick(); return false; });
